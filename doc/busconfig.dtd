@@ -17,6 +17,8 @@
 <!ELEMENT user (#PCDATA)>
 <!ELEMENT listen (#PCDATA)>
 <!ELEMENT includedir (#PCDATA)>
+<!ATTLIST includedir
+          ignore_missing (yes|no) "no">
 <!ELEMENT servicedir (#PCDATA)>
 <!ELEMENT servicehelper (#PCDATA)>
 <!ELEMENT auth (#PCDATA)>

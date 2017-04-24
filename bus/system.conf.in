@@ -135,7 +135,7 @@
        holes in the above policy for specific services. -->
   <includedir>system.d</includedir>
 
-  <includedir>@SYSCONFDIR_FROM_PKGDATADIR@/dbus-1/system.d</includedir>
+  <includedir ignore_missing="yes">@SYSCONFDIR_FROM_PKGDATADIR@/dbus-1/system.d</includedir>
 
   <!-- This is included last so local configuration can override what's 
        in this standard file -->
