@@ -29,6 +29,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <malloc.h>
 #ifdef HAVE_SIGNAL_H
 #include <signal.h>
 #endif
@@ -747,6 +748,13 @@ main (int argc, char **argv)
 
   _dbus_verbose ("We are on D-Bus...\n");
   _dbus_daemon_report_ready ();
+  /*
+   * during init we may have allocated and then freed memory, which
+   * the C library will buffer for us. This is a good place to really
+   * free that memory. Any memory we allocate/free during our normal
+   * operation will still use the C library buffers.
+   */
+  malloc_trim(0);
   _dbus_loop_run (bus_context_get_loop (context));
 
   bus_context_shutdown (context);
