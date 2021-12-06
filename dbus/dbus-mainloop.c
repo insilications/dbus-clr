@@ -23,6 +23,7 @@
  */
 
 #include <config.h>
+#include <malloc.h>
 #include "dbus-mainloop.h"
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -884,8 +885,10 @@ _dbus_loop_run (DBusLoop *loop)
   _dbus_verbose ("Running main loop, depth %d -> %d\n",
                  loop->depth - 1, loop->depth);
   
-  while (loop->depth != our_exit_depth)
+  while (loop->depth != our_exit_depth) {
+    malloc_trim(0);
     _dbus_loop_iterate (loop, TRUE);
+  }
 
   _dbus_loop_unref (loop);
 }
