@@ -57,8 +57,6 @@ macro(add_unit_test _name _target)
         WORKING_DIRECTORY ${DBUS_TEST_WORKING_DIR}
     )
     set(_env)
-    list(APPEND _env "DBUS_SESSION_BUS_ADDRESS=")
-    list(APPEND _env "DBUS_FATAL_WARNINGS=1")
     list(APPEND _env "DBUS_TEST_DAEMON=${DBUS_TEST_DAEMON}")
     list(APPEND _env "DBUS_TEST_DATA=${DBUS_TEST_DATA}")
     list(APPEND _env "DBUS_TEST_DBUS_LAUNCH=${DBUS_TEST_DBUS_LAUNCH}")
