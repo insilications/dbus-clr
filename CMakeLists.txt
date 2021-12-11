@@ -627,7 +627,7 @@ else(WIN32)
     set(DBUS_SYSTEM_CONFIG_FILE  ${DBUS_DATADIR}/dbus-1/system.conf)
     set(DBUS_SESSION_CONFIG_FILE ${DBUS_DATADIR}/dbus-1/session.conf)
     set(DBUS_USER "messagebus")
-    set(DBUS_TEST_USER "nobody")
+    set(DBUS_TEST_USER "boni")
   # For best security, assume that all non-Windows platforms can do
   # credentials-passing.
     set(DBUS_SESSION_CONF_MAYBE_AUTH_EXTERNAL "<auth>EXTERNAL</auth>")
