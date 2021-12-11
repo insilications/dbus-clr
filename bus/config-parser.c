@@ -860,14 +860,40 @@ start_busconfig_child (BusConfigParser   *parser,
     }
   else if (element_type == ELEMENT_INCLUDEDIR)
     {
-      if (!check_no_attributes (parser, "includedir", attribute_names, attribute_values, error))
+
+      Element *e;
+      const char *ignore_missing;
+ 
+      if ((e = push_element (parser, ELEMENT_INCLUDEDIR)) == NULL)
+         {
+           BUS_SET_OOM (error);
+           return FALSE;
+         }
+ 
+      e->d.include.ignore_missing = FALSE;
+
+      if (!locate_attributes (parser, "includedir",
+                              attribute_names,
+                              attribute_values,
+                              error,
+                              "ignore_missing", &ignore_missing,
+                              NULL))
         return FALSE;
 
-      if (push_element (parser, ELEMENT_INCLUDEDIR) == NULL)
+      if (ignore_missing != NULL)
         {
-          BUS_SET_OOM (error);
-          return FALSE;
+          if (strcmp (ignore_missing, "yes") == 0)
+            e->d.include.ignore_missing = TRUE;
+          else if (strcmp (ignore_missing, "no") == 0)
+            e->d.include.ignore_missing = FALSE;
+          else
+            {
+              dbus_set_error (error, DBUS_ERROR_FAILED,
+                              "ignore_missing attribute must have value \"yes\" or \"no\"");
+              return FALSE;
+            }
         }
+
 
       return TRUE;
     }
@@ -2459,6 +2485,7 @@ servicehelper_path (BusConfigParser   *parser,
 static dbus_bool_t
 include_dir (BusConfigParser   *parser,
              const DBusString  *dirname,
+             dbus_bool_t        ignore_missing,
              DBusError         *error)
 {
   DBusString filename;
@@ -2475,20 +2502,26 @@ include_dir (BusConfigParser   *parser,
 
   retval = FALSE;
   
-  dir = _dbus_directory_open (dirname, error);
 
-  if (dir == NULL)
+  dbus_error_init (&tmp_error);
+
+  dir = _dbus_directory_open (dirname, &tmp_error);
+ 
+   if (dir == NULL)
     {
-      if (dbus_error_has_name (error, DBUS_ERROR_FILE_NOT_FOUND))
+      if (dbus_error_has_name (&tmp_error, DBUS_ERROR_FILE_NOT_FOUND) &&
+          ignore_missing)
         {
-          dbus_error_free (error);
+          dbus_error_free (&tmp_error);
           goto success;
         }
       else
-        goto failed;
+        {
+          dbus_move_error (&tmp_error, error);
+          goto failed;
+        }
     }
 
-  dbus_error_init (&tmp_error);
   while (_dbus_directory_get_next_file (dir, &filename, &tmp_error))
     {
       DBusString full_path;
@@ -2723,7 +2756,8 @@ bus_config_parser_content (BusConfigParser   *parser,
             goto nomem;
           }
         
-        if (!include_dir (parser, &full_path, error))
+        if (!include_dir (parser, &full_path,
+                          e->d.include.ignore_missing, error))
           {
             _dbus_string_free (&full_path);
             return FALSE;

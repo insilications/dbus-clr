@@ -40,9 +40,9 @@
 
   <!-- Config files are placed here that among other things, 
        further restrict the above policy for specific services. -->
-  <includedir>session.d</includedir>
+  <includedir ignore_missing="yes">session.d</includedir>
 
-  <includedir>@SYSCONFDIR_FROM_PKGDATADIR@/dbus-1/session.d</includedir>
+  <includedir ignore_missing="yes">@SYSCONFDIR_FROM_PKGDATADIR@/dbus-1/session.d</includedir>
 
   <!-- This is included last so local configuration can override what's 
        in this standard file -->
